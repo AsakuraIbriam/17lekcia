@@ -1,0 +1,43 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(int argc, char*argv[]){
+
+    
+    if(argc != 2) {
+        fprintf(stderr, "Invalid arguments count\n");
+        return EXIT_FAILURE;
+    }
+    
+    for(int i = 0; i < (atoi(argv[1])); i++) {
+        
+        int fd = fork();
+        srand(time(NULL) ^ (getpid()<<16));
+        if(fd == 0) {
+            char buff[10];
+            int n = 5;
+            int i = 0;
+            
+            while(n--) {
+               buff[i] = (int)(rand()%(122-97 + 1) + 97); 
+                i++;
+               buff[i] =  (int)(rand()%(90-65 + 1) + 65);
+                i++;
+            }
+            printf("%s\n", buff);
+        exit(0);
+        } else {
+        wait(NULL);
+        }
+    }
+
+    return 0;
+}

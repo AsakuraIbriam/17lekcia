@@ -1,0 +1,39 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <time.h>
+#include <signal.h>
+
+void infPrint() {
+    while(1) {
+         sleep(5);
+        printf("MMS C Camp\n");
+       
+    }
+}
+
+int main(int argc, char*argv[]){
+    struct sigaction actSIGINT;
+    struct sigaction actSIGSTP;
+
+    actSIGINT.sa_handler = infPrint;
+        //actSIGINT.sa_mask = SA_RESTART;
+    sigaction(SIGINT, &actSIGINT, NULL);
+
+    actSIGSTP.sa_handler = infPrint;
+    //actSIGSTP.sa_mask = SA_RESTART;
+    sigaction(SIGTSTP, &actSIGSTP, NULL);
+
+
+    infPrint();
+
+    
+    return EXIT_SUCCESS;
+}
+//SIGKILL & SIGSTOP, ne mogat da budat maskirani, zaSHTOTO se izpolzvat ot opercaionnata sistema pri cpu schechulinga na procesite da pauzira ili terminira ДАДЕН proces

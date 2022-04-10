@@ -1,0 +1,76 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(int argc, char*argv[]){
+
+    int pipefd[2];
+    int pid;
+    
+    int begin;
+    int end;
+
+    if(1 == argc) {
+        double d = 0;
+        printf("Sum = %2.lf\n", d);
+        return EXIT_SUCCESS;
+    }
+
+    if(-1 == pipe(pipefd)) {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+
+    pid = fork();
+    if(-1 == pid) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if(pid == 0) {
+
+        close(pipefd[1]);
+        begin = argc / 2;
+        end = argc;
+        double sum = 0;
+        for(int i = begin; i < end; i++) {
+            
+            sum+=atof(argv[i]);
+            printf("Child - %lf\n", sum);
+        }
+        
+        write(pipefd[0], &sum, sizeof(double));
+
+        close(pipefd[0]);
+        exit(EXIT_SUCCESS);
+    } else {
+        
+        close(pipefd[0]);
+        begin = 1;
+        end = argc / 2;
+        double sum = 0;
+        for(int j = begin; j < end; j++){
+            sum+=atof(argv[j]);
+            printf("Parrent - %lf\n", sum);
+        }
+
+        wait(NULL);
+        double childRes = 0;
+        printf("Child result = %lf\n", childRes);
+        read(pipefd[1], &childRes, sizeof(double));
+
+        
+        
+        close(pipefd[1]);;
+        sum+=childRes;
+
+        printf("Sum = %.2lf\n", sum);
+    }
